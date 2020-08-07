@@ -1,13 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"  xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
 
-
+<div>
+    <div style="width:100px;height: 100px;line-height: 100px; text-align: center;font-size: 12px;background: #f8f9fa;cursor: pointer" id="showImgBox">点击上传图片</div>
+    <input accept="image/*" type="file" id="uploadIMG" onchange="btnUploadFile(event)" style="display: none" multiple/>
+</div>
 <script src="/js/fileuploader.js"></script>
+<script th:src="@{/webjars/jquery/3.5.1/jquery.js}" ></script>
+<script>
+
+    var fileUploader = function () {
+
+    }
+
+
+
+    fileUploader.prototype.init=function(config){
+        fileUploader.prototype.config = config;
+    }
+
+
+
+    $(function () {
+        $("#showImgBox").click(function(){
+            $("#uploadIMG").click();
+        });
+    });
+
+    function btnUploadFile(e){
+        //获取图片文件
+        var imgFile = e.target.files[0];
+        //后缀选取
+        if (!/\/(?:jpeg|jpg|png)/i.test(imgFile.type)){
+            console.log(图片格式不支持);
+            return;
+        }
+        //异步读取文件
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+            //替换url
+            $("#showImgBox").html("<img id='showImg' style='width:100%;height:100%'>");
+            $("#showImg").attr("src",evt.target.result);
+        }
+        reader.readAsDataURL(imgFile);
+    }
+
+
+    var formData = new FormData();
+    formData.append("imageFile", document.getElementById('uploadIMG').files[0]);
+    formData.append("photoUrl", $("#showImg").attr("src"));
+    $.ajax({
+        url: url + token,
+        async: false,
+        type: "POST",
+        data: formData,
+        dataType: "json",
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            console.log("success");
+        },
+        error: function (xhr) {
+            console.log("error");
+        }
+    });
+
+    (function ($) {
+        $.fn.extend({
+            upload_img:function(options){
+                var dft = { ///默认参数设置
+                    cpBy: "dafi",
+                    url: "http://www.dafi.com",
+                    size: "12px",
+                    align: "left"
+                };
+                //测试
+                // var dftt={
+                //     aa:'1',
+                //     align:'left',
+                // };
+                var ops = $.extend({},dft,options);//jQuery.extend() 函数用于将一个或多个对象的内容合并到目标对象。这里其实是让实例化中的对象合并到目标对象里(覆盖插件默认参数)
+                //console.log(ops);
+                var style = 'style="font-size:' + ops.size + ';text-align:' + ops.align + ';"';
+                var cpTxt = '<p' + ' ' + style + '>此文章版权归<a target="_blank" href="' + ops.url + '">' + ops.cpBy + '</a>所有</p>';
+                $(this).append(cpTxt);
+            }
+        });
+    })(jQuery);
+
+</script>
 
 </body>
 </html>
