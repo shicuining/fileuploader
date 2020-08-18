@@ -3,116 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link th:href="@{/webjars/bootstrap/4.5.0/css/bootstrap.css}" rel="stylesheet">
+    <link href="/css/fileuploader.css"  rel="stylesheet">
 </head>
 <body>
-
-<div id="testbox">
+<div class="p-5">
+    <div id="testbox"></div>
 </div>
+<div class="p-5">
+    <div id="testbox2"></div>
+</div>
+<script th:src="@{/webjars/jquery/1.11.1/jquery.js}" ></script>
 <script src="/js/fileuploader.js"></script>
-<script th:src="@{/webjars/jquery/3.5.1/jquery.js}" ></script>
 <script>
-
-    var FileUploader = (function () {
-        var config = {
-            width: 100,
-            height: 100,
-            background: "#f8f9fa",
-            multiple: false
-        }
-        function getTmpl() {
-            var tmpl = $(
-                '<div>' +
-                '    <div style="width:' + config.width + 'px;height: ' + config.height + 'px;line-height: ' + config.height + 'px; text-align: center;font-size: 12px;background: ' + config.background + ';cursor: pointer;vertical-align: middle"  class="FileUploader_Show">点击上传图片</div>' +
-                '    <input accept="image/*" type="file" class="FileUploader_Input"  style="display: none" ' + (config.multiple ? +"multiple" : "") + ' />' +
-                '</div>'
-            );
-            var showBox = tmpl.find(".FileUploader_Show");
-            var input = tmpl.find(".FileUploader_Input");
-            showBox.click(function () {
-                input.click();
-            });
-            input.change(function () {
-                var e = $(this)[0];
-                for(var i =0;i<e.files.length;i++){
-                    upload(tmpl,showBox,e.files[i])
-                }
-            });
-            return tmpl;
-        }
-        function upload(tmpl,showBox,imgFile) {
-            if (!/\/(?:jpeg|jpg|png)/i.test(imgFile.type)) {
-                return;
-            }
-            //异步读取文件
-            var reader = new FileReader();
-            reader.onload = function (evt) {
-                if (showBox.find("img").length > 0) {
-                    showBox.find("img").attr("src", evt.target.result);
-                } else {
-                    if (config.multiple) {
-                        var newTmpl = getTmpl();
-                        newTmpl.find("img").attr("src", evt.target.result);
-                        newTmpl.insertBefore(tmpl);
-                    } else {
-                        showBox.css("font-size", "0");
-                        showBox.html("<img style='vertical-align: middle; max-width:" + config.width + "px;max-height:" + config.height + "px' src='" + evt.target.result + "'>");
-                    }
-                }
-            }
-            reader.readAsDataURL(imgFile);
-        }
-        function init(box) {
-            var tmpl = getTmpl();
-            tmpl.appendTo(box);
-
-        }
-        function _fileUploader(box, options) {
-            var _this = this;
-            if(_this instanceof  _fileUploader){
-                config = $.extend({},config,options);
-                _this.init = function () {
-                    init(box);
-                }
-            }else{
-                return new _fileUploader(box, config);
-            }
-        }
-        return _fileUploader;
-    })();
-
-    //
-    // var formData = new FormData();
-    // formData.append("imageFile", document.getElementById('uploadIMG').files[0]);
-    // formData.append("photoUrl", $("#showImg").attr("src"));
-    // $.ajax({
-    //     url: url + token,
-    //     async: false,
-    //     type: "POST",
-    //     data: formData,
-    //     dataType: "json",
-    //     processData: false,
-    //     contentType: false,
-    //     success: function (data) {
-    //         console.log("success");
-    //     },
-    //     error: function (xhr) {
-    //         console.log("error");
-    //     }
-    // });
-
     $(function () {
-        $("#testbox").upload_img({multiple:true});
+        $("#testbox").upload_img("/upload",{multiple:false,width:160,height:90});
+        $("#testbox2").upload_img("/upload",{multiple:true,width:90,height:90});
     });
-
-    (function ($) {
-        $.fn.extend({
-            upload_img:function(config){
-                var fileUploader = new FileUploader($(this),config);
-                fileUploader.init();
-            }
-        });
-    })(jQuery);
-
 </script>
 
 </body>
